@@ -44,3 +44,16 @@ Run Docker network smoke tests **before**, not concurrently with, `make verify`/
 ## Required installation checks
 
 No actual Home Assistant OS/Supervisor device or household OIDC provider was available in the development environment. On the amd64 Dell Tiny PC, install the custom repository, confirm an unauthorized HA user cannot open the admin panel, open the complete app from the sidebar, edit a harmless manual entry on desktop/iPhone, then perform a backup/restore drill. These checks are required before relying on it for household decisions. See the [add-on guide](../addons/family_finance_hub/DOCS.md) and [Linux guide](home/README.md).
+
+## Recorded development results (2026-10-30)
+
+- SQLite: **1,763 tests**, successful; 12 skipped by the existing suite.
+- PostgreSQL: **1,762 tests**, successful; 12 skipped, plus all **13** final Planner regression tests successful after the added payoff/stale-balance guard.
+- Ruff, mypy, import boundaries, Semgrep (including all 26 failing/22 passing rule examples), generated API/feature maps and fleet checks passed.
+- Full frontend suite: **2,363 tests passed** across 172 files (`npm test -- --maxWorkers=2`), run separately from browser/Docker work to avoid resource-related timeouts.
+- Frontend types/lint/build and documentation build/link checks passed; the pre-existing CostBasisEditor initial-state warning remains.
+- Official browser/accessibility verification: **50 pages and flows passed**, producing **213 screenshots** through the official screenshot sync. The existing `ai-card-fill` flow hit a resource-related page-load timeout on its first attempt and passed on a fresh automatic retry. No new accessibility baseline exceptions were added.
+- Both Docker images built. The add-on fixture passed real desktop/iPhone-width interaction, peer spoof rejection, token-scoped sensors, restart persistence and portable backup/restore. The home Compose fixture passed TLS certificate verification, OIDC auth gating, storage persistence and stopped-volume backup/copy restore.
+- Pre-push checks: **179 tests**, successful; 2 skipped.
+
+The browser Ingress relay is a simulation. Hardware HA OS/Supervisor installation and a real household identity-provider login were not available for testing.
