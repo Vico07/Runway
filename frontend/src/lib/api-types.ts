@@ -138,6 +138,70 @@ export interface EnteredStatement {
   next_close: string;
 }
 
+export interface FamilyAccountBody {
+  balance: number | string;
+  balance_date: string;
+  id?: string;
+  name?: string;
+  kind?: string;
+}
+
+export interface FamilyAccountReply {
+  ok: boolean;
+  id: string;
+}
+
+export interface FamilyEvent {
+  key: string;
+  name: string;
+  date: string;
+  amount: number;
+  kind: string;
+}
+
+export interface FamilyForecastBody {
+  start: string;
+  account_id: string;
+  balances?: Record<string, number | string>;
+  edits?: Record<string, number | string>;
+}
+
+export interface FamilyForecastReply {
+  start: string;
+  account_id: string;
+  baseline: FamilyMonth[];
+  scenario: FamilyMonth[];
+  events: FamilyEvent[];
+  warnings: string[];
+  scenario_warnings: string[];
+}
+
+export interface FamilyLow {
+  date: string;
+  balance: number;
+}
+
+export interface FamilyModuleBody {
+  action?: string;
+  data: Record<string, unknown>;
+}
+
+/** Extensible feature data; every write is independently validated by its handler. */
+export interface FamilyModuleReply {
+  data: Record<string, unknown>;
+}
+
+export interface FamilyMonth {
+  month: string;
+  opening: number;
+  closing: number;
+  income: number;
+  expenses: number;
+  net: number;
+  low: FamilyLow;
+  days: FamilyLow[];
+}
+
 /**
  * GET /api/investments/holding/{id}?period=1M|3M|YTD|1Y|2Y|MAX (default 1Y): one holding's page. `total` is the
  * whole portfolio's value (the holding's share of it is `holding.allocation`), `dividends_12m` the dividends it paid
@@ -475,6 +539,21 @@ export interface TxNew {
 
 /** Each covered route ("METHOD /path", as in runway/server/routes.py): what it takes and what it answers. */
 export interface Endpoints {
+  "POST /api/family/accounts": { body: FamilyAccountBody; reply: FamilyAccountReply };
+  "POST /api/family/forecast": { body: FamilyForecastBody; reply: FamilyForecastReply };
+  "GET /api/ha/summary": { body: never; reply: FamilyModuleReply };
+  "GET /api/ha/upcoming": { body: never; reply: FamilyModuleReply };
+  "GET /api/ha/cashflow": { body: never; reply: FamilyModuleReply };
+  "GET /api/ha/budget": { body: never; reply: FamilyModuleReply };
+  "GET /api/spending": { body: never; reply: FamilyModuleReply };
+  "POST /api/spending/classify": { body: FamilyModuleBody; reply: FamilyModuleReply };
+  "POST /api/spending/import": { body: FamilyModuleBody; reply: FamilyModuleReply };
+  "GET /api/cardplanner": { body: never; reply: FamilyModuleReply };
+  "POST /api/cardplanner/profile": { body: FamilyModuleBody; reply: FamilyModuleReply };
+  "POST /api/cardplanner/quote": { body: FamilyModuleBody; reply: FamilyModuleReply };
+  "POST /api/cardplanner/purchase": { body: FamilyModuleBody; reply: FamilyModuleReply };
+  "POST /api/cardplanner/rule": { body: FamilyModuleBody; reply: FamilyModuleReply };
+  "POST /api/cardplanner/purchase/{id}/cancel": { body: never; reply: FamilyModuleReply };
   "GET /api/accounts": { body: never; reply: AccountItem[] };
   "GET /api/transactions": { body: never; reply: TxList };
   "POST /api/transactions": { body: TxNew; reply: TxCreated };

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { appPath } from "$lib/path";
   import { lock, lockScreenShown, unlock } from "$lib/lock.svelte";
   import { signOut } from "$lib/nav.svelte";
   import { Button } from "$lib/components/ui/button";
@@ -23,7 +24,7 @@
 <svelte:document onvisibilitychange={back} />
 
 <main class="flex min-h-dvh flex-col items-center justify-center gap-6 px-6 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)] text-center" aria-labelledby="lock-title">
-  <img src="/logo.svg" width="56" height="56" alt="" />
+  <img src={appPath("/logo.svg")}  width="56" height="56" alt="" />
   <div class="flex flex-col items-center gap-2">
     <h1 id="lock-title" class="flex items-center gap-2 text-2xl font-bold tracking-tight"><Lock class="size-5" aria-hidden="true" />Runway is locked</h1>
     <p class="max-w-xs text-sm text-muted-foreground">Unlock with Face ID, Touch ID or this device’s passcode.</p>
@@ -32,5 +33,5 @@
     <ScanFace class="size-5" aria-hidden="true" />{lock.busy ? "Unlocking…" : "Unlock"}
   </Button>
   {#if lock.error}<p role="alert" class="max-w-xs text-sm text-destructive">{lock.error}</p>{/if}
-  <a href="/auth/logout" onclick={signOut} class="text-sm text-muted-foreground underline underline-offset-4">Can’t unlock? Sign out</a>
+  <a href={appPath("/auth/logout")}  onclick={signOut} class="text-sm text-muted-foreground underline underline-offset-4">Can’t unlock? Sign out</a>
 </main>

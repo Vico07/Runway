@@ -7,26 +7,41 @@ description: Every API route, with its handler, the web app files that call it, 
 
 Where each feature lives. Every route in `runway/server/routes.py` is listed with its handler, the web app files that call it, the tests that exercise it and the docs page that describes it. The same data, for tools and agents, is in [`docs/feature-map.json`](https://github.com/AnthonyPluth/Runway/blob/main/docs/feature-map.json). `make feature-map` regenerates both; `make check` and CI fail when they are out of date, or when a route has no test and isn't on `tools/feature_map_allowlist.txt` (a list that only shrinks).
 
-189 routes; 27 have no test yet.
+204 routes; 27 have no test yet.
 
 A route counts as tested when a file in `tests/` names its handler, or calls its address (with its method, when the test writes one). A web app caller is an `api(` or `apiCall(` call with a literal address; one built in a variable isn't seen.
 
 | Route | Handler | Web app | Tests | Docs |
 | --- | --- | --- | --- | --- |
-| `GET /api/backup` | `backups.py:api_backup` | - | `test_applock.py`, `test_backup.py`, `test_http_pinned.py` | [start/deployment](/Runway/start/deployment/) |
+| `GET /api/backup` | `backups.py:api_backup` | - | `test_applock.py`, `test_backup.py`, `test_ha_ingress.py`, `test_http_pinned.py` | [start/deployment](/Runway/start/deployment/) |
 | `POST /api/backup/inspect` | `backups.py:api_backup_inspect` | `lib/components/settings/BackupSection.svelte` | `test_backup.py`, `test_http_pinned.py` | [start/deployment](/Runway/start/deployment/) |
 | `POST /api/restore` | `backups.py:api_restore` | `lib/components/settings/BackupSection.svelte` | `test_backup.py`, `test_hardening.py`, `test_http_pinned.py` | [start/deployment](/Runway/start/deployment/) |
-| `POST /api/sync` | `connections.py:api_sync` | `lib/app.svelte.ts`, `lib/components/settings/PlaidLink.svelte`, `lib/components/settings/SimpleFinSetup.svelte` | `test_api_handlers.py`, `test_http_pinned.py`, `test_monitoring.py` | [using/settings](/Runway/using/settings/) |
+| `POST /api/sync` | `connections.py:api_sync` | `lib/app.svelte.ts`, `lib/components/settings/PlaidLink.svelte`, `lib/components/settings/SimpleFinSetup.svelte` | `test_api_handlers.py`, `test_ha_ingress.py`, `test_http_pinned.py`, `test_monitoring.py` | [using/settings](/Runway/using/settings/) |
 | `POST /api/sync/auto` | `connections.py:api_sync_auto` | `lib/app.svelte.ts` | `test_http_pinned.py`, `test_http_server.py` | [using/settings](/Runway/using/settings/) |
 | `POST /api/investments/sync` | `investments.py:api_investments_sync` | - | `test_http_pinned.py` | [using/investments](/Runway/using/investments/) |
-| `GET /api/investments/stream` | `investments.py:api_quote_stream` | `lib/components/investments/live.ts` | `test_http_pinned.py`, `test_investments.py` | [using/investments](/Runway/using/investments/) |
-| `GET /api/merchants/{id}/logo` | `merchants.py:api_merchant_logo_file` | - | `test_brands.py`, `test_categorize.py`, `test_hardening.py`, `test_http_pinned.py`, `test_merchants.py`, `test_monitoring.py`, `test_recurring.py` | [using/transactions](/Runway/using/transactions/) |
+| `GET /api/investments/stream` | `investments.py:api_quote_stream` | - | `test_http_pinned.py`, `test_investments.py` | [using/investments](/Runway/using/investments/) |
+| `GET /api/merchants/{id}/logo` | `merchants.py:api_merchant_logo_file` | - | `test_brands.py`, `test_categorize.py`, `test_ha_ingress.py`, `test_hardening.py`, `test_http_pinned.py`, `test_merchants.py`, `test_monitoring.py`, `test_recurring.py` | [using/transactions](/Runway/using/transactions/) |
 | `GET /api/carta/capture` | `equity.py:api_carta_capture` | - | `test_http_pinned.py` | [using/net-worth](/Runway/using/net-worth/) |
 | `GET /api/retail/extension.zip` | `retail.py:api_extension_zip` | - | `test_http_pinned.py` | [using/browser-extension](/Runway/using/browser-extension/) |
 | `GET /api/state` | `state.py:api_state` | `lib/app.svelte.ts` | `test_api_handlers.py`, `test_api_queries.py`, `test_api_validation.py`, `test_applock.py`, `test_backup.py`, `test_categorize.py`, `test_churn_found.py`, `test_finnhub.py`, `test_http_pinned.py`, `test_http_server.py`, `test_mcp.py`, `test_monitoring.py`, `test_security.py`, `test_server.py` | [using/overview](/Runway/using/overview/) |
 | `GET /api/overview` | `state.py:api_overview` | `lib/prefetch.ts`, `pages/Transactions.svelte` | `test_api_handlers.py`, `test_api_validation.py`, `test_applock.py`, `test_categorize.py`, `test_forecast_cycles.py`, `test_http_pinned.py`, `test_http_server.py` | [using/overview](/Runway/using/overview/) |
-| `GET /api/accounts` | `accounts.py:api_accounts` | `lib/accounts.ts` | `test_api_contract.py`, `test_api_handlers.py`, `test_api_queries.py`, `test_http_pinned.py`, `test_routes.py`, `test_statements.py` | [using/settings](/Runway/using/settings/) |
-| `POST /api/accounts/{id}` | `accounts.py:api_account_update` | `lib/components/settings/AccountRow.svelte`, `lib/components/settings/LoanTerms.svelte`, `lib/components/settings/PlaidLink.svelte`, `pages/NetWorth.svelte` | `test_api_handlers.py`, `test_api_validation.py`, `test_mcp.py`, `test_networth.py` | [using/settings](/Runway/using/settings/) |
+| `POST /api/family/accounts` | `family.py:api_family_account` | `pages/Family.svelte` | `test_api_contract.py`, `test_family.py`, `test_ha_ingress.py` | - |
+| `POST /api/family/forecast` | `family.py:api_family_forecast` | `pages/Family.svelte` | `test_api_contract.py`, `test_family.py` | - |
+| `GET /api/ha/summary` | `ha.py:api_ha_summary` | - | `test_api_contract.py`, `test_ha_ingress.py` | - |
+| `GET /api/ha/upcoming` | `ha.py:api_ha_upcoming` | - | `test_api_contract.py` | - |
+| `GET /api/ha/cashflow` | `ha.py:api_ha_cashflow` | - | `test_api_contract.py` | - |
+| `GET /api/ha/budget` | `ha.py:api_ha_budget` | - | `test_api_contract.py` | - |
+| `GET /api/spending` | `spending.py:api_spending` | `pages/Spending.svelte` | `test_api_contract.py`, `test_spending_hub.py` | - |
+| `POST /api/spending/classify` | `spending.py:api_spending_classify` | `pages/Spending.svelte` | `test_api_contract.py`, `test_spending_hub.py` | - |
+| `POST /api/spending/import` | `spending.py:api_spending_import` | `pages/Spending.svelte` | `test_api_contract.py`, `test_spending_hub.py` | - |
+| `GET /api/cardplanner` | `cardplanner.py:api_cardplanner` | `pages/CardPlanner.svelte` | `test_api_contract.py` | - |
+| `POST /api/cardplanner/profile` | `cardplanner.py:api_card_profile` | `pages/CardPlanner.svelte` | `test_api_contract.py` | - |
+| `POST /api/cardplanner/quote` | `cardplanner.py:api_card_quote` | `pages/CardPlanner.svelte` | `test_api_contract.py` | - |
+| `POST /api/cardplanner/purchase` | `cardplanner.py:api_card_purchase` | `pages/CardPlanner.svelte` | `test_api_contract.py` | - |
+| `POST /api/cardplanner/rule` | `cardplanner.py:api_card_rule` | `pages/CardPlanner.svelte` | `test_api_contract.py`, `test_cardplanner.py` | - |
+| `POST /api/cardplanner/purchase/{id}/cancel` | `cardplanner.py:api_card_cancel` | `pages/CardPlanner.svelte` | `test_api_contract.py` | - |
+| `GET /api/accounts` | `accounts.py:api_accounts` | `lib/accounts.ts`, `pages/Family.svelte` | `test_api_contract.py`, `test_api_handlers.py`, `test_api_queries.py`, `test_ha_ingress.py`, `test_http_pinned.py`, `test_routes.py`, `test_statements.py` | [using/settings](/Runway/using/settings/) |
+| `POST /api/accounts/{id}` | `accounts.py:api_account_update` | `lib/components/settings/AccountRow.svelte`, `lib/components/settings/LoanTerms.svelte`, `lib/components/settings/PlaidLink.svelte`, `pages/Family.svelte`, `pages/NetWorth.svelte` | `test_api_handlers.py`, `test_api_validation.py`, `test_family.py`, `test_mcp.py`, `test_networth.py` | [using/settings](/Runway/using/settings/) |
 | `GET /api/accounts/{id}/logo-options` | `accounts.py:api_account_logo_options` | - | `test_brands.py` | [using/settings](/Runway/using/settings/) |
 | `POST /api/accounts/{id}/logo` | `accounts.py:api_account_logo` | - | `test_brands.py`, `test_mcp.py` | [using/settings](/Runway/using/settings/) |
 | `POST /api/accounts/{id}/statements` | `accounts.py:api_statement_add` | `lib/components/settings/CardStatement.svelte` | `test_statements.py` | [using/settings](/Runway/using/settings/) |
@@ -90,7 +105,7 @@ A route counts as tested when a file in `tests/` names its handler, or calls its
 | `POST /api/rules/{id}` | `categories.py:api_rule_update` | `lib/components/settings/RuleEditor.svelte` | `test_http_server.py`, `test_mcp.py` | [using/transactions](/Runway/using/transactions/) |
 | `POST /api/rules/{id}/apply` | `categories.py:api_rule_apply` | `lib/components/settings/ruleApply.svelte.ts` | `test_bulk.py`, `test_http_server.py`, `test_mcp.py` | [using/transactions](/Runway/using/transactions/) |
 | `GET /api/recurring` | `recurring.py:api_recurring` | `lib/components/recurring/RecurringItem.svelte`, `lib/components/recurring/load.ts` | `test_api_queries.py`, `test_categories_recurring_pinned.py`, `test_categorize.py`, `test_recurring.py`, `test_recurring_suggestions.py` | [using/recurring](/Runway/using/recurring/) |
-| `POST /api/recurring` | `recurring.py:api_recurring_add` | `lib/components/recurring/RecurringView.svelte` | `test_api_validation.py`, `test_categories_recurring_pinned.py`, `test_forecast_schedule.py`, `test_http_server.py`, `test_recurring.py`, `test_recurring_suggestions.py` | [using/recurring](/Runway/using/recurring/) |
+| `POST /api/recurring` | `recurring.py:api_recurring_add` | `lib/components/recurring/RecurringView.svelte`, `pages/Family.svelte` | `test_api_validation.py`, `test_categories_recurring_pinned.py`, `test_family.py`, `test_forecast_schedule.py`, `test_http_server.py`, `test_recurring.py`, `test_recurring_suggestions.py` | [using/recurring](/Runway/using/recurring/) |
 | `GET /api/recurring/suggestions` | `recurring.py:api_recurring_suggestions` | `lib/components/recurring/RecurringView.svelte` | `test_recurring_suggestions.py` | [using/recurring](/Runway/using/recurring/) |
 | `POST /api/recurring/suggestions/dismiss` | `recurring.py:api_recurring_suggestion_dismiss` | `lib/components/recurring/RecurringView.svelte` | `test_recurring_suggestions.py` | [using/recurring](/Runway/using/recurring/) |
 | `GET /api/recurring/suggestions/dismissed` | `recurring.py:api_recurring_suggestions_dismissed` | `lib/components/recurring/RecurringView.svelte` | `test_recurring_suggestions.py` | [using/recurring](/Runway/using/recurring/) |

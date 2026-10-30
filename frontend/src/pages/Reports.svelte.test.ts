@@ -40,3 +40,10 @@ describe("Reports page", () => {
     expect(screen.getAllByRole("link").map((a) => a.textContent!.trim()).slice(0, 5)).toEqual(["Cash flow", "Over time", "Merchants", "Income", "Breakdown"]);
   });
 });
+
+ it("opens existing reports for a manual household without a bank connection", async () => {
+   app.state = {connected:false,has_accounts:true,manual_only:true};
+   render(Reports);
+   expect(await screen.findByText(/Nothing in/)).toBeInTheDocument();
+   expect(screen.queryByText("Connect a bank to see where your money goes")).not.toBeInTheDocument();
+ });

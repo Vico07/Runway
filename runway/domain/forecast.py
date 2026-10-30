@@ -439,7 +439,7 @@ def card_cycle(conn, card: dict, today: date, bank: dict) -> dict:
     due = parse_day(bank["next_due_date"]) if bank["next_due_date"] and parse_day(bank["next_due_date"]) > last_close \
         else next_after(last_close, bank["due_day"])
     remaining = max(0.0, statement - paid - credits)
-    plan = payment_plan(conn, card["id"], bank.get("purchase_apr"))
+    plan = card.get("_scenario_plan") or payment_plan(conn, card["id"], bank.get("purchase_apr"))
     payment = min(remaining, max(0.0, statement_payment(plan, statement, bank["minimum_payment"]) - paid))
     return {
         "last_close": last_close.isoformat(),
@@ -642,26 +642,56 @@ def build(conn, today: date | None = None, horizon_days: int = 90) -> dict:
     return project(conn, today, horizon_days)[0]
 
 
-def project(conn, today: date | None = None, horizon_days: int = 90) -> tuple[dict, dict[str, str]]:
+def project(conn, today: date | None = None, horizon_days: int = 90, *,
+            balances: dict[str, float] | None = None, edits: dict[str, float] | None = None,
+            planned: list[dict] | None = None, plans: dict[str, dict] | None = None) -> tuple[dict, dict[str, str]]:
     """The forecast (build), and the card payment edits it found saved while their key was the due date, which it
     applied: {new key: old key}, for move_old_keys to move to their new keys."""
     today = today or date.today()
     end = today + timedelta(days=horizon_days)
     accounts = db.rows(conn.execute(select(Account).where(Account.hidden == 0).order_by(Account.name)))
+    # Scenario inputs only change these local copies. Saved balances and occurrence edits stay untouched.
+    for account in accounts:
+        if balances and account["id"] in balances:
+            account["balance"] = balances[account["id"]]
     by_id = {a["id"]: a for a in accounts}
     cash, pending = forecast_accounts(conn, accounts, today)
     by_id.update({a["id"]: a for a in cash})
     cash_ids = {a["id"] for a in cash}
     cards = [a for a in accounts if a["kind"] == "credit"]
+    for card in cards:
+        if plans and card["id"] in plans:
+            card["_scenario_plan"] = plans[card["id"]]
     moved = moved_to(conn)
     # In the order they were made (id): the order of a statement's recurring charges (estimate_parts) and of events on
     # the same day for the same amount. Unordered, Postgres reads them wherever the rows happen to sit.
     recurring = [dict(r, account_id=moved.get(r["account_id"], r["account_id"]))
                  for r in db.rows(conn.execute(select(Recurring).where(Recurring.active == 1).order_by(Recurring.id)))]
+    recurring.extend(dict(item) for item in (planned or []))
     overrides = {r["key"]: r["amount"] for r in conn.execute(select(Override.key, Override.amount))}
+    overrides.update(edits or {})
     events = recurring_events(conn, recurring, by_id, overrides, today, end)
 
     banks = {c["id"]: bank_statement(conn, c, today) for c in cards}
+    # Fresh manually verified cycle days disambiguate end-of-month statements (e.g. February 28 vs day 31).
+    cycle_profiles = db.get_settings(conn, ["family_card_profile:" + c["id"] for c in cards])
+    for cid, bank in banks.items():
+        raw = cycle_profiles.get("family_card_profile:" + cid)
+        if not bank or not raw:
+            continue
+        try:
+            profile = json.loads(raw)
+        except (ValueError, TypeError):
+            continue
+        if not isinstance(profile, dict):
+            continue
+        verified = profile.get("verified_on")
+        if not isinstance(verified, str) or not (today - timedelta(days=30)).isoformat() <= verified <= today.isoformat() or not profile.get("source"):
+            continue
+        for key in ("closing_day", "due_day"):
+            value = profile.get(key)
+            if isinstance(value, int) and not isinstance(value, bool) and 1 <= value <= 31:
+                bank[key] = value
     on_cards = card_fees(conn, by_id, cards, banks, today, end, recurring)
 
     plan = budget_plan(conn, today) if cash else []
@@ -1106,7 +1136,7 @@ def assumed_cycle_payments(conn, no_statement: dict[str, list[dict]], *, by_id: 
             continue
         payer = by_id[card["pay_from"]]
         cycles = simulate_statements(
-            month_end_cycles(today, end), card_id=cid, start=today, owing=owed(card), plan=payment_plan(conn, cid),
+            month_end_cycles(today, end), card_id=cid, start=today, owing=owed(card), plan=card.get("_scenario_plan") or payment_plan(conn, cid),
             today=today, budgets=spend.get(cid, {}),
             charges=[e for e in events if e["account_id"] == cid and e["kind"] == "recurring"], fees=no_statement[cid],
             covers=covers[cid], spent_on=spend_of.get(cid, {}), owed_now=True)

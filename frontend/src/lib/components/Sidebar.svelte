@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { appPath } from "$lib/path";
   import { app, route } from "$lib/app.svelte";
   import { MAIN_NAV, MONEY_NAV, currentPage, signOut, signedInUser, syncDot, syncStatus, type NavGroup, type NavItem } from "$lib/nav.svelte";
   import { tablet } from "$lib/rail.svelte";
@@ -74,7 +75,7 @@
   </div>
   <SyncButton />
   {#if user}
-    <a href="/auth/logout" onclick={signOut} title="Sign out" aria-label="Sign out" class="text-muted-foreground hover:text-foreground">
+    <a href={appPath("/auth/logout")}  onclick={signOut} title="Sign out" aria-label="Sign out" class="text-muted-foreground hover:text-foreground">
       <LogOut class="size-4" />
     </a>
   {/if}
@@ -84,7 +85,7 @@
      a 72px rail; from 1024 px up the full sidebar. -->
 <aside class="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-1 border-r border-border bg-sidebar p-3 desktop:flex rail:w-[72px] rail:items-center rail:px-2">
   <a href="#overview" class="group/nav relative mb-4 flex items-center gap-2.5 rounded-md px-2 font-semibold focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none rail:mb-3 rail:size-11 rail:justify-center rail:px-0">
-    <img src="/logo.svg" alt="" width="24" height="24" /><span class={tip}>Runway</span>
+    <img src={appPath("/logo.svg")}  alt="" width="24" height="24" /><span class={tip}>Runway</span>
     {#if s?.version}<span class="text-xs font-normal text-muted-foreground rail:hidden" title={`Runway ${s.version}`}>{s.version}</span>{/if}
   </a>
   <nav class="flex flex-col gap-1 rail:items-center" aria-label="Main">
@@ -109,7 +110,7 @@
     </Sheet.Trigger>
     <Sheet.Content side="left" class="md:w-80">
       <Sheet.Header>
-        <Sheet.Title class="flex items-center gap-2.5"><img src="/logo.svg" alt="" width="24" height="24" />Runway
+        <Sheet.Title class="flex items-center gap-2.5"><img src={appPath("/logo.svg")}  alt="" width="24" height="24" />Runway
           {#if s?.version}<span class="text-xs font-normal text-muted-foreground">{s.version}</span>{/if}</Sheet.Title>
         <Sheet.Description class="sr-only">All pages, your account and the sync status.</Sheet.Description>
       </Sheet.Header>

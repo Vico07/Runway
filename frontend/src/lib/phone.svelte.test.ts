@@ -62,10 +62,11 @@ describe("date fields", () => {
 });
 
 describe("zoom", () => {
-  it("is off for the page: the viewport meta for the installed app and Android, touch-action for Safari in a tab", () => {
+  it("allows browser zoom without removing the responsive viewport or scrolling", () => {
     const html = readFileSync(new URL("../../index.html", import.meta.url), "utf8");
-    expect(html).toMatch(/<meta name="viewport" content="[^"]*\bmaximum-scale=1\b[^"]*\buser-scalable=no\b[^"]*">/);
+    expect(html).toContain("width=device-width, initial-scale=1, viewport-fit=cover");
+    expect(html).not.toMatch(/maximum-scale|user-scalable=no/);
     const css = readFileSync(new URL("../app.css", import.meta.url), "utf8");
-    expect(css).toMatch(/^\s*html \{ touch-action: pan-x pan-y; \}/m);
+    expect(css).toMatch(/^\s*html \{ touch-action: auto; \}/m);
   });
 });

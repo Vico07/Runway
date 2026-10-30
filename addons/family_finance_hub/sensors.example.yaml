@@ -1,0 +1,34 @@
+# Optional: replace the resource with the actual internal hostname shown by HA.
+# secrets.yaml (not Git): family_finance_authorization: "Bearer <your random sensor token>"
+rest:
+  - resource: http://YOUR_ADDON_HOSTNAME:8766/api/ha/summary
+    headers:
+      Authorization: !secret family_finance_authorization
+    scan_interval: 300
+    sensor:
+      - name: Family Finance Checking Balance
+        unique_id: family_finance_checking_balance
+        unit_of_measurement: USD
+        availability: "{{ value_json.data.checking_balance is not none }}"
+        value_template: "{{ value_json.data.checking_balance }}"
+      - name: Family Finance Next Paycheck
+        unique_id: family_finance_next_paycheck
+        availability: "{{ value_json.data.next_paycheck is not none }}"
+        value_template: "{{ value_json.data.next_paycheck.date if value_json.data.next_paycheck else none }}"
+      - name: Family Finance Upcoming Bills
+        unique_id: family_finance_upcoming_bills
+        value_template: "{{ value_json.data.upcoming | count }}"
+        json_attributes_path: $.data
+        json_attributes: [upcoming]
+      - name: Family Finance Forecast Warnings
+        unique_id: family_finance_forecast_warnings
+        value_template: "{{ value_json.data.warnings | count }}"
+        json_attributes_path: $.data
+        json_attributes: [warnings]
+    binary_sensor:
+      - name: Family Finance Negative Forecast
+        unique_id: family_finance_negative_forecast
+        value_template: "{{ value_json.data.negative_forecast }}"
+      - name: Family Finance Stale Data
+        unique_id: family_finance_stale_data
+        value_template: "{{ value_json.data.stale }}"

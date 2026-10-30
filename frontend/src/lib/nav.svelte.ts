@@ -24,6 +24,9 @@ export const MAIN_NAV: NavGroup = {
   label: "Day to day",
   items: [
     { page: "overview", label: "Overview", icon: House },
+    { page: "family", label: "Family Finance Hub", icon: Landmark },
+    { page: "spending", label: "Budget & Spending", icon: ChartPie },
+    { page: "cardplanner", label: "Smart Card Planner", icon: CreditCard },
     { page: "transactions", label: "Transactions", icon: List },
     { page: "budget", label: "Budget", icon: ChartPie },
     { page: "recurring", label: "Recurring", icon: Repeat },
@@ -69,6 +72,7 @@ export const syncDot = (tone: SyncTone) =>
 export function syncStatus(s: AppState | null, now: Date = new Date()): SyncStatus {
   const none = { title: "", detail: "", href: "" };
   if (!s) return { text: "", tone: "", ...none };
+  if (s.manual_only) return { text: "Manual records · verify dates", tone: "warn", title: "Bank synchronization is disabled; review balance dates and imported history.", detail: "", href: "#family" };
   if (s.syncing) return { text: "Syncing…", tone: "busy", ...none };
   if (s.last_log && !s.last_log.ok) {
     const why = s.last_log.message ?? "";

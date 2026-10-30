@@ -51,7 +51,7 @@ accounts = Table(
     Column('in_forecast', Integer, server_default=text('1'), doc='cash accounts: include in the projection'),
     Column('hidden', Integer, server_default=text('0')),
     Column('owner', Text, doc='a signed-in person\'s first name, "Joint", or NULL'),
-    Column('provider', Text, server_default=text("'simplefin'"), doc='where balances and transactions come from: simplefin | plaid'),
+    Column('provider', Text, server_default=text("'simplefin'"), doc='where balances and transactions come from: simplefin | plaid | manual'),
     Column('plaid_account_id', Text, doc='the same account in a Plaid connection, if any'),
     Column('provider_since', Text, doc='when the provider last changed (YYYY-MM-DD); overlapping history is matched up'),
     Column('networth_hidden', Integer, server_default=text('0'), doc='1: left out of Net worth (still shown everywhere else)'),

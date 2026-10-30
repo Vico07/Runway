@@ -8,6 +8,7 @@
 </script>
 
 <script lang="ts">
+  import { appPath } from "$lib/path";
   import { api } from "$lib/api";
   import { app, refreshState, reload } from "$lib/app.svelte";
   import { Alert, AlertDescription } from "$lib/components/ui/alert";
@@ -82,7 +83,7 @@
 <Group title="Backup & restore">
   <div class="cell flex-col items-start gap-1.5">
     <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
-      <Button href="/api/backup" download onclick={downloaded}
+      <Button href={appPath("/api/backup")}  download onclick={downloaded}
         title={`Everything, from the ${app.state?.database === "postgres" ? "Postgres" : "SQLite"} database. Restoring it elsewhere needs this Runway’s secret key.`}>Download a backup</Button>
       {#if lastBackup}<span class="text-sm text-muted-foreground" title={lastBackup.full}>Last backup: {lastBackup.day}</span>{/if}
     </div>

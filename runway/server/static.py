@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import gzip
 import hashlib
+import html
 import os
 import secrets
 import threading
@@ -63,6 +64,10 @@ def serve(h: Handler, path: str) -> None:
         nonce = secrets.token_urlsafe(16)
         with open(full, "rb") as f:
             data = f.read().replace(b"<script ", f'<script nonce="{nonce}" '.encode())
+        base = getattr(h, "ingress_base", "")
+        if base:
+            data = data.replace(b"<head>", f'<head><meta name="runway-base-path" content="{html.escape(base, quote=True)}">'.encode())
+            data = data.replace(b'href="/', f'href="{base}/'.encode()).replace(b'src="/', f'src="{base}/'.encode())
         return send_file(h, data, ctype, "no-store", None, gz_ok, nonce)
     entry = _static_entry(full)
     cache = cache_control(full)

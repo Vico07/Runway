@@ -9,6 +9,10 @@ const plaid = (accounts: PlaidStatus["items"][number]["accounts"] = [], configur
 });
 
 describe("sourceInfo", () => {
+  it("identifies a manual account without claiming its balance comes from a bank", () => {
+    expect(sourceInfo(acct({ provider: "manual" }), null).source).toBe("Manual");
+    expect(sourceInfo(acct({ provider: "manual" }), plaid()).source).toBe("Manual");
+  });
   it("is plain SimpleFIN for an account with no Plaid link, and offers no source section without Plaid", () => {
     const i = sourceInfo(acct(), null);
     expect(i.source).toBe("SimpleFIN");

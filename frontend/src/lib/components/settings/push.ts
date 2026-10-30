@@ -1,3 +1,4 @@
+import { basePath } from "$lib/path";
 // Push notifications on this device. They go through the service worker at /sw.js (registered when the app opens, see
 // main.ts); registering it again from here is the same registration.
 
@@ -15,7 +16,7 @@ export function deviceName(): string {
   return `${dev} · ${br}`;
 }
 
-export const pushSupported = () => "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
+export const pushSupported = () => !basePath() && "serviceWorker" in navigator && "PushManager" in window && "Notification" in window;
 
 /** This device's service worker registration and push subscription, if any. A worker that's still starting (the app
  *  was just opened) may not know its subscription yet, so this waits for it to be ready (for a few seconds at most). */

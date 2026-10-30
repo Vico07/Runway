@@ -1,0 +1,14 @@
+{
+  "name": "card-planner-scenario",
+  "page": "cardplanner",
+  "steps": [
+    {"wait_for": "role=button[name='Compare cards and debit']"},
+    {"fill": {"selector": "label:has-text('Merchant') input >> nth=0", "text": "Synthetic example shop"}},
+    {"fill": {"selector": "label:has-text('Purchase amount') input", "text": "100"}},
+    {"fill": {"selector": "label:has-text('Proposed purchase date') input", "text": "2026-06-18"}},
+    {"click": "role=button[name='Compare cards and debit']"},
+    {"wait_for": "text=No verified recommendation yet"},
+    {"screenshot": "uncertain-terms"},
+    {"click": "role=button[name='Discard comparison']"}
+  ]
+}

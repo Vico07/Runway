@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1
 # Runway: personal finance, forecasting and investments.
 
 # The base images are pinned by digest (the tag is for reading); Dependabot moves the digests weekly.
@@ -9,17 +10,24 @@ ENV PIP_NO_CACHE_DIR=1 \
     POETRY_VIRTUALENVS_IN_PROJECT=true \
     POETRY_VIRTUALENVS_OPTIONS_NO_PIP=true \
     POETRY_NO_INTERACTION=1
-RUN pip install "poetry==2.5.1"
+# Optional public CA bundle for managed build proxies; never retained in a layer.
+RUN --mount=type=secret,id=proxy_ca_bundle \
+    if [ -f /run/secrets/proxy_ca_bundle ]; then export PIP_CERT=/run/secrets/proxy_ca_bundle; fi; \
+    pip install "poetry==2.5.1"
 WORKDIR /app
 COPY pyproject.toml poetry.lock ./
-RUN poetry install --only main --no-root --no-ansi
+RUN --mount=type=secret,id=proxy_ca_bundle \
+    if [ -f /run/secrets/proxy_ca_bundle ]; then export REQUESTS_CA_BUNDLE=/run/secrets/proxy_ca_bundle SSL_CERT_FILE=/run/secrets/proxy_ca_bundle; fi; \
+    poetry install --only main --no-root --no-ansi
 
 # 2. Build the web app (frontend/) into runway/static/app. It's plain files, so it's built once on the build machine
 #    whatever the image's architecture.
 FROM --platform=$BUILDPLATFORM node:26-slim@sha256:ec7758ee051e457b468b32bde57b0879010b325bb9862718e9615225ce4aaae1 AS web
 WORKDIR /web/frontend
 COPY frontend/package.json frontend/package-lock.json ./
-RUN npm ci --no-audit --no-fund
+RUN --mount=type=secret,id=proxy_ca_bundle \
+    if [ -f /run/secrets/proxy_ca_bundle ]; then export NODE_EXTRA_CA_CERTS=/run/secrets/proxy_ca_bundle; fi; \
+    npm ci --no-audit --no-fund
 COPY frontend/ ./
 RUN npm run build
 
@@ -60,6 +68,8 @@ COPY run.py alembic.ini ./
 COPY runway ./runway
 COPY --from=web /web/runway/static/app ./runway/static/app
 COPY extension ./extension
+# Cloud checkouts may have private directory modes; runtime uid must read source and migration scripts.
+RUN chmod -R a+rX /app/runway /app/extension && chmod a+r /app/run.py /app/alembic.ini
 
 USER runway
 VOLUME ["/data"]

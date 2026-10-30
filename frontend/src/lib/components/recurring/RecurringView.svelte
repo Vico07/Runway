@@ -69,7 +69,7 @@
   }
   // What's spotted in your history is extra: if it can't be looked up, the page goes on without it.
   async function loadSuggestions() {
-    if (!connected) { suggestions = []; dismissed = []; return; }
+    if (!connected && !app.state?.has_accounts) { suggestions = []; dismissed = []; return; }
     try {
       [suggestions, dismissed] = await Promise.all([api<Suggestion[]>("/api/recurring/suggestions"), api<DismissedSuggestion[]>("/api/recurring/suggestions/dismissed")]);
     } catch { suggestions = []; dismissed = []; }

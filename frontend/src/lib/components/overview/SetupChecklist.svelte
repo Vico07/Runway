@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { appPath } from "$lib/path";
   import { api } from "$lib/api";
   import { app, refreshState } from "$lib/app.svelte";
   import { Button } from "$lib/components/ui/button";
@@ -92,7 +93,7 @@
     </Card.Content>
   {:else}
   <Card.Header>
-    {#if welcome}<img src="/logo.svg" alt="" width="40" height="40" class="mb-2" />{/if}
+    {#if welcome}<img src={appPath("/logo.svg")}  alt="" width="40" height="40" class="mb-2" />{/if}
     <Card.Title class={welcome ? "text-2xl" : ""}>{welcome ? "Welcome to Runway" : "Finish setting up"}</Card.Title>
     {#if !welcome}
       <Card.Action class="flex items-center gap-1">

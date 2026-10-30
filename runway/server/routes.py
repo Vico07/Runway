@@ -14,6 +14,10 @@ from .api.accounts import (
     api_account_logo, api_account_logo_options, api_account_removal, api_account_remove, api_account_restore, api_account_update,
     api_accounts, api_accounts_deleted, api_statement_add, api_statement_remove
 )
+from .api.spending import api_spending, api_spending_classify, api_spending_import
+from .api.cardplanner import api_cardplanner, api_card_profile, api_card_quote, api_card_purchase, api_card_cancel, api_card_rule
+from .api.ha import api_ha_summary, api_ha_upcoming, api_ha_cashflow, api_ha_budget
+from .api.family import api_family_account, api_family_forecast
 from .api.backups import api_backup, api_backup_inspect, api_restore
 from .api.budget import api_budget, api_budget_set
 from .api.budget_suggest import api_budget_suggestions
@@ -92,6 +96,21 @@ ROUTES: list[tuple[str, str, Callable[..., Any]]] = [
     ("GET", "/api/retail/extension.zip", api_extension_zip),
     ("GET", "/api/state", api_state),
     ("GET", "/api/overview", api_overview),
+    ("POST", "/api/family/accounts", api_family_account),
+    ("POST", "/api/family/forecast", api_family_forecast),
+    ("GET", "/api/ha/summary", api_ha_summary),
+    ("GET", "/api/ha/upcoming", api_ha_upcoming),
+    ("GET", "/api/ha/cashflow", api_ha_cashflow),
+    ("GET", "/api/ha/budget", api_ha_budget),
+    ("GET", "/api/spending", api_spending),
+    ("POST", "/api/spending/classify", api_spending_classify),
+    ("POST", "/api/spending/import", api_spending_import),
+    ("GET", "/api/cardplanner", api_cardplanner),
+    ("POST", "/api/cardplanner/profile", api_card_profile),
+    ("POST", "/api/cardplanner/quote", api_card_quote),
+    ("POST", "/api/cardplanner/purchase", api_card_purchase),
+    ("POST", "/api/cardplanner/rule", api_card_rule),
+    ("POST", "/api/cardplanner/purchase/{id}/cancel", api_card_cancel),
     ("GET", "/api/accounts", api_accounts),
     ("POST", "/api/accounts/{id}", api_account_update),
     ("GET", "/api/accounts/{id}/logo-options", api_account_logo_options),

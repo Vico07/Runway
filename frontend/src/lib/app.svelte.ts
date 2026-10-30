@@ -111,6 +111,7 @@ window.addEventListener("runway:signed-out", (e) => {
 // more than an hour old. The server decides, so this is cheap to call. When the sync finishes, the page loads again with the new data.
 let syncWatch: ReturnType<typeof setInterval> | null = null;
 export async function syncOnVisit(): Promise<void> {
+  if (app.state?.manual_only) return;
   try {
     const r = await api<{ started: boolean }>("/api/sync/auto", { method: "POST", background: true });
     if (r.started) watchSync();
@@ -131,7 +132,7 @@ function watchSync(sayFailure = false): void {
       if (app.sessionExpired) { clearInterval(syncWatch!); syncWatch = null; }
       return;
     }
-    if (app.state?.syncing) return;
+    if (app.state?.syncing || app.state?.manual_only) return;
     clearInterval(syncWatch!); syncWatch = null;
     const synced = app.state?.last_sync_ok !== before && app.state?.last_log?.ok;
     // A sync you asked for that failed says so (the one on opening Runway only shows it in the sidebar).
@@ -145,7 +146,7 @@ function watchSync(sayFailure = false): void {
 /** The Sync button: sync the banks now (SimpleFIN and Plaid), say how it went,
  *  and load the page again. A sync that's already running (the daily one, or another tab's) is watched instead. */
 export async function syncNow(): Promise<void> {
-  if (app.state?.syncing) return;
+  if (app.state?.syncing || app.state?.manual_only) return;
   if (app.state) app.state.syncing = true;
   try {
     const r = await api<{ new: number; bank_messages?: string[] }>("/api/sync", { method: "POST" });

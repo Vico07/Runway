@@ -1,0 +1,4 @@
+{$RUNWAY_HOSTNAME} {
+    tls internal
+    reverse_proxy runway:8765
+}

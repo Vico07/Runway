@@ -1,0 +1,30 @@
+name: Family Finance Hub
+version: "0.1.0"
+slug: family_finance_hub
+description: Runway manual household finance, budgeting and card planning through authenticated Home Assistant Ingress
+url: https://github.com/Vico07/Runway
+arch: [amd64]
+startup: application
+boot: auto
+init: false
+ingress: true
+ingress_port: 8765
+ingress_entry: /#family
+ingress_stream: true
+panel_title: Family Finance Hub
+panel_icon: mdi:finance
+panel_admin: true
+host_network: false
+hassio_api: false
+homeassistant_api: false
+backup: cold
+ports:
+  8766/tcp: null
+ports_description:
+  8766/tcp: Optional read-only sensor API; leave disabled for internal HA access only
+options:
+  timezone: America/New_York
+  sensor_token: ""
+schema:
+  timezone: str
+  sensor_token: password

@@ -35,3 +35,9 @@ artifacts/
 
 # Subagents' git worktrees (AGENTS.md, "Working in a container")
 .claude/worktrees/
+
+# Private home deployment exports and TLS material
+backups/
+restore/
+*.pem
+*.crt

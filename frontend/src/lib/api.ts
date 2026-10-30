@@ -1,6 +1,7 @@
 // Talking to Runway's server. Reads belong to the page that asked for them: moving to another page cancels them,
 // and a cancelled read never answers, so a slow reply can't draw the old page over the new one. `keep` opts out.
 
+import { appPath } from "./path";
 import { dataChanged } from "./swr";
 
 let pageLoads = new AbortController();
@@ -36,7 +37,7 @@ declare global {
 
 /** Sign in again, then come back to this page. */
 export function signInUrl(): string {
-  return "/auth/login?next=" + encodeURIComponent(location.pathname + location.hash);
+  return appPath("/auth/login") + "?next=" + encodeURIComponent(location.pathname + location.hash);
 }
 
 // The last reply to each read, by address, with its ETag: asked again, Runway answers 304 when the reply would be the
@@ -70,7 +71,7 @@ export async function api<T = unknown>(path: string, opts: Options = {}): Promis
   // device's encrypted copy of it (lib/deviceCache.ts).
   if (init.method !== "GET" && !opts.background) dataChanged();
   let res: Response;
-  try { res = await fetch(path, init); }
+  try { res = await fetch(appPath(path), init); }
   catch (err) {
     if (page?.signal.aborted) return new Promise(() => {});
     // fetch fails with a TypeError when there's no answer at all; each browser words it differently

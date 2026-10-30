@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { appPath } from "$lib/path";
   import { api } from "$lib/api";
   import { copyText } from "$lib/copy";
   import { app, refreshState } from "$lib/app.svelte";
@@ -100,7 +101,7 @@
       <summary class="flex cursor-pointer list-none items-center gap-1.5 py-1 text-sm text-muted-foreground select-none [&::-webkit-details-marker]:hidden">
         <ChevronRight class="size-4 shrink-0 transition-transform group-open:rotate-90" aria-hidden="true" />Install steps</summary>
       <ol class={`${helpCls} mt-1 list-decimal space-y-1.5 pl-5`}>
-        <li><a class={linkCls} href="/api/retail/extension.zip" download>Download the extension</a>, unzip it, and in Chrome (or Edge, Brave, Arc) open
+        <li><a class={linkCls} href={appPath("/api/retail/extension.zip")}  download>Download the extension</a>, unzip it, and in Chrome (or Edge, Brave, Arc) open
           <code class="rounded bg-muted px-1 text-foreground">chrome://extensions</code>, turn on Developer mode and choose <b class="text-foreground">Load unpacked</b>.</li>
         <li>Give it Runway's address ({location.origin}) and a key{#if !r.token}: <Button variant="outline" size="sm" class="ml-1" onclick={newKey}>Make a key</Button>{/if}.</li>
         <li>Stay signed in to Amazon, Target, Costco and Carta in that browser, and use the extension's <b class="text-foreground">Import</b> button.</li>

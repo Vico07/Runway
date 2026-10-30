@@ -168,3 +168,7 @@ describe("signOut", () => {
     expect(forgetReplies).toHaveBeenCalledOnce();
   });
 });
+
+ it("manual-only status points to recorded balance dates rather than disabled bank sync", () => {
+   expect(syncStatus(s({manual_only:true,last_log:{ok:false,message:"Old failure"}}))).toMatchObject({text:"Manual records · verify dates",tone:"warn",href:"#family"});
+ });

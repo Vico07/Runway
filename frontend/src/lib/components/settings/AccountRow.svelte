@@ -102,7 +102,7 @@
       else if (st.source === "manual" && st.due) bits.push({ text: `statement due ${fmtDate(st.due)}` });
     }
     if (a.networth_hidden) bits.push({ text: "not in net worth", title: "Left out of the Net worth page; still counted everywhere else" });
-    bits.push({ text: source, title: a.provider === "plaid" || own ? "Balances and transactions come from Plaid" : "Balances and transactions come from SimpleFIN" });
+    bits.push({ text: source, title: a.provider === "manual" ? "Balance entered in Family Finance Hub" : a.provider === "plaid" || own ? "Balances and transactions come from Plaid" : "Balances and transactions come from SimpleFIN" });
     return bits;
   });
 

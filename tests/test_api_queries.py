@@ -131,6 +131,8 @@ def old_api_state(conn):
     last_log = conn.execute(select(SyncLog.at, SyncLog.ok, SyncLog.message).order_by(SyncLog.id.desc()).limit(1)).fetchone()
     return {
         "connected": bank_configured(conn),
+        "manual_only": os.environ.get("RUNWAY_MANUAL_ONLY") == "1" or os.environ.get("RUNWAY_HA_INGRESS") == "1",
+        "has_accounts": bool(conn.execute(select(Account.id).where(Account.hidden == 0).limit(1)).fetchone()),
         "brands": brands.account_brands(conn),
         "connection_logos": brands.connection_logos(conn),
         "simplefin": bool(db.get_setting(conn, sk.SIMPLEFIN_ACCESS_URL)),

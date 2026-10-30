@@ -72,6 +72,10 @@ docker compose up -d
 
 The image is `ghcr.io/anthonypluth/runway:latest` (Intel/AMD and ARM). Beyond `localhost`, Runway requires sign-in through an OpenID Connect provider such as Authentik, Authelia, Keycloak, Pocket ID, Google or Microsoft Entra. Registering it with your provider, running from source and connecting your first bank are in the [quick start](https://anthonypluth.github.io/Runway/start/quick-start/).
 
+## Family Finance Hub fork
+
+This fork adds a manual-first Family Finance Hub, Budget & Spending, Smart Card Planner, and authenticated Home Assistant Ingress support while preserving Runway's existing Python/Svelte application. See the [native amd64 Home Assistant add-on guide](addons/family_finance_hub/DOCS.md), [home Linux Compose installation](deploy/home/README.md), and [feature documentation](docs/src/content/docs/using/family.md). These deployment profiles disable bank synchronization and start with an empty household database. No TV dashboard or personal financial dataset is included.
+
 ## Documentation
 
 **[anthonypluth.github.io/Runway](https://anthonypluth.github.io/Runway/)**

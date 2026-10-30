@@ -8,7 +8,7 @@
   const busy = $derived(!!app.state?.syncing);
 </script>
 
-{#if app.state?.connected}
+{#if app.state?.connected && !app.state?.manual_only}
   <button type="button" onclick={syncNow} disabled={busy} title="Sync now" aria-label="Sync now"
     class={cn("flex size-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground disabled:cursor-default disabled:opacity-60 disabled:hover:bg-transparent", className)}>
     <RefreshCw class={cn("size-3.5", busy && "animate-spin")} aria-hidden="true" />

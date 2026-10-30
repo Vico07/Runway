@@ -274,9 +274,9 @@
        line under the filters, with what they add up to. -->
   <div class="flex items-baseline gap-2">
     <h1 bind:this={rv.heading} tabindex="-1" class="text-[34px] leading-[1.05] font-extrabold tracking-[-0.035em] outline-none">Transactions</h1>
-    {#if review}<span class="text-base font-normal text-muted-foreground tabular-nums">{txs.list && app.state?.connected && txs.count ? `${txs.count} to go` : ""}</span>{/if}
+    {#if review}<span class="text-base font-normal text-muted-foreground tabular-nums">{txs.list && (app.state?.connected || app.state?.has_accounts) && txs.count ? `${txs.count} to go` : ""}</span>{/if}
   </div>
-  {#if !review && app.state?.connected}
+  {#if !review && (app.state?.connected || app.state?.has_accounts)}
     <Button variant="outline" onclick={openAdd} title="Add a transaction by hand"><Plus />Add</Button>
   {/if}
   {#if review && app.state?.ai_configured}
@@ -284,7 +284,7 @@
       <AiButton busy={aiStatus === "asking"} busyLabel="Suggesting…" label={aiStatus === "asked" ? "Ask again" : "Suggest categories"}
         onclick={() => ai?.run()} />
     {/if}
-  {:else if review && app.state?.connected}
+  {:else if review && (app.state?.connected || app.state?.has_accounts)}
     <p class="text-sm text-muted-foreground">AI suggestions: <a href="#setup/connections" class="font-medium text-primary">Settings › Connections</a></p>
   {/if}
 </header>
@@ -294,7 +294,7 @@
   { id: "review", href: "#review", label: "To review", badge: app.state?.review_count || undefined },
 ]} />
 
-{#if !app.state?.connected}
+{#if !(app.state?.connected || app.state?.has_accounts)}
   <NotConnected title={review ? "Connect a bank to review transactions" : "Connect a bank to see your transactions"} />
 {:else}
 {#if setupError}

@@ -3,6 +3,7 @@ real reply, on the sample data plus the cases that add fields (a card's statemen
 store order), matches docs/openapi.json; the generated files are current; and tools/api_contract.py describes the
 types it's given."""
 import ast
+from datetime import date
 import importlib.util
 import json
 import os
@@ -96,6 +97,8 @@ class Replies(DbCase):
         self.assertEqual(found, [], route)
 
     def test_every_covered_route_is_checked(self):
+        self.test_family_modules()
+        self.test_family()
         self.test_accounts()
         self.test_budget()
         self.test_transactions()
@@ -104,6 +107,40 @@ class Replies(DbCase):
         self.test_investments_summary()
         self.test_plaid_refresh()
         self.assertEqual(self.checked, covered(), "check each route the contract covers here")
+
+    def test_family_modules(self):
+        from runway.server.api import cardplanner as planner, ha, spending
+        from runway.domain import forecast
+        fc, _ = forecast.project(self.c, TODAY, 90)
+        checking = next(a["id"] for a in fc["accounts"] if a["kind"] == "checking")
+        card = self.c.execute(select(Account.id).where(Account.kind == "credit")).scalar()
+        self.check("GET /api/spending", spending.api_spending(self.c, {}, {}))
+        self.check("POST /api/spending/classify", spending.api_spending_classify(self.c, {}, {"data": {"category": "Synthetic fixed expense", "classification": "fixed"}}))
+        self.check("POST /api/spending/import", spending.api_spending_import(self.c, {}, {"data": {"account": checking, "csv": "date,amount,description,category\n2026-06-01,-5,SYNTHETIC,Shopping"}}))
+        self.check("GET /api/cardplanner", planner.api_cardplanner(self.c, {}, {}))
+        self.check("POST /api/cardplanner/profile", planner.api_card_profile(self.c, {}, {"data": {"card_id": card}}))
+        purchase = {"merchant": "Synthetic purchase", "amount": 10, "date": TODAY.isoformat(), "card_id": card, "checking_id": checking, "strategy": "full"}
+        self.check("POST /api/cardplanner/quote", planner.api_card_quote(self.c, {}, {"data": purchase}))
+        # Quote/safety calculations are exercised against real statements in test_cardplanner; this checks wire shapes.
+        with mock.patch("runway.domain.cardplanner.quote", return_value={"options": [{"card_id": card, "eligible": True, "rewards": {}, "interest_estimate": 0, "plan": {"pay_mode": "full", "pay_amount": None, "apr": None}}]}):
+            saved = planner.api_card_purchase(self.c, {}, {"data": purchase})
+        self.check("POST /api/cardplanner/purchase", saved)
+        self.check("POST /api/cardplanner/purchase/{id}/cancel", planner.api_card_cancel(self.c, {}, {}, saved["data"]["id"]))
+        self.check("POST /api/cardplanner/rule", planner.api_card_rule(self.c, {}, {"data": {"card_id": card, "merchant": "Synthetic"}}))
+        for path, handler in (("summary", ha.api_ha_summary), ("upcoming", ha.api_ha_upcoming), ("cashflow", ha.api_ha_cashflow), ("budget", ha.api_ha_budget)):
+            self.check("GET /api/ha/" + path, handler(self.c, {}, {}))
+
+    def test_family(self):
+        from runway.server.api.family import api_family_account, api_family_forecast
+        created = api_family_account(self.c, {}, {"name": "Example checking", "balance": 100,
+                                                  "balance_date": "2026-06-17"})
+        self.check("POST /api/family/accounts", created)
+        # Demo's selected checking account, without changing its selection settings.
+        from runway.domain import forecast
+        fc, _ = forecast.project(self.c, date(2026, 11, 1), 60)
+        account = next(a for a in fc["accounts"] if a["kind"] == "checking")
+        self.check("POST /api/family/forecast", api_family_forecast(self.c, {}, {
+            "start": "2026-11-01", "account_id": account["id"]}))
 
     def test_accounts(self):
         # A card linked through Plaid with a statement from it; demo-card has one entered by hand, demo-mortgage is a loan.

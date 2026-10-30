@@ -1,0 +1,51 @@
+name: runway-family
+
+services:
+  runway:
+    image: runway-family:local
+    build:
+      context: ../..
+      args:
+        VERSION: family-local
+    restart: unless-stopped
+    command: ["python", "run.py", "--no-sync"]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    volumes:
+      - runway_data:/data
+    environment:
+      TZ: ${TZ:-America/New_York}
+      RUNWAY_HOST: 0.0.0.0
+      RUNWAY_DATA: /data
+      RUNWAY_NO_SYNC: "1"
+      RUNWAY_MANUAL_ONLY: "1"
+      RUNWAY_PUBLIC_URL: https://${RUNWAY_HOSTNAME:?Set RUNWAY_HOSTNAME in deploy/home/.env}
+      RUNWAY_SECRET_KEY: ${RUNWAY_SECRET_KEY:?Generate RUNWAY_SECRET_KEY in deploy/home/.env}
+      OIDC_ISSUER: ${OIDC_ISSUER:?Set your OIDC issuer in deploy/home/.env}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:?Set your OIDC client ID in deploy/home/.env}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:?Set your OIDC client secret in deploy/home/.env}
+      OIDC_ALLOWED_EMAILS: ${OIDC_ALLOWED_EMAILS:?Set allowed household emails in deploy/home/.env}
+    # No host port: all browser requests must go through HTTPS and Runway's OIDC sign-in.
+
+  https:
+    image: caddy:2@sha256:5e5286cb37d44086d651a5363f05f43a692ce4d649d88fb1bd844579f45fa9e8
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    depends_on:
+      runway:
+        condition: service_healthy
+    ports:
+      - "${RUNWAY_BIND_IP:?Set your server LAN IP in deploy/home/.env}:443:443"
+    environment:
+      NO_PROXY: runway,localhost,127.0.0.1,::1
+      no_proxy: runway,localhost,127.0.0.1,::1
+      RUNWAY_HOSTNAME: ${RUNWAY_HOSTNAME:?Set RUNWAY_HOSTNAME in deploy/home/.env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+
+volumes:
+  runway_data:
+  caddy_data:
+  caddy_config:

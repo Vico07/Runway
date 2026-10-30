@@ -23,7 +23,7 @@ from . import mcp_oauth, mcp_server
 from .. import applock, monitoring, oidc
 from ..domain import retail
 from ..storage import settings_keys as sk
-from . import mcp_http, oauth_http, routes, static, sync
+from . import ingress, mcp_http, oauth_http, routes, static, sync
 from .common import (NOT_READ, ApiError, BadJson, Response, _current, body_etag, etag_matches, header_value, host_allowed,
                      server_error)
 from .oauth_http import OAUTH_METADATA, OAUTH_PUBLIC
@@ -126,8 +126,11 @@ class Handler(BaseHTTPRequestHandler):
 
     def _security_headers(self, nonce: str | None = None, csp: str | None = None) -> None:
         self.send_header("X-Content-Type-Options", "nosniff")
-        self.send_header("Content-Security-Policy", csp or content_security_policy(nonce))
-        self.send_header("X-Frame-Options", "DENY")
+        policy = csp or content_security_policy(nonce)
+        if ingress.enabled():
+            policy = policy.replace("frame-ancestors 'none'", "frame-ancestors 'self'")
+        self.send_header("Content-Security-Policy", policy)
+        self.send_header("X-Frame-Options", "SAMEORIGIN" if ingress.enabled() else "DENY")
         self.send_header("Referrer-Policy", "no-referrer")
         self.send_header("Cross-Origin-Opener-Policy", "same-origin-allow-popups")
         # The browser extension reads the answers to its own calls (it has its key, and permission for this site).
@@ -170,6 +173,8 @@ class Handler(BaseHTTPRequestHandler):
     def _json(self, status: int, obj, etag: bool = False) -> None:
         # allow_nan=False: an inf (an overflowed sum) would go out as `Infinity`, which isn't JSON; a ValueError here
         # is a bug, answered as one (_error).
+        if getattr(self, "ingress_base", ""):
+            obj = ingress.resource_paths(obj, self.ingress_base)
         body = json.dumps(obj, allow_nan=False).encode()
         if not etag:
             return self._send(status, body)
@@ -410,6 +415,10 @@ class Handler(BaseHTTPRequestHandler):
         origin = self.headers.get("Origin")
         if origin == "null" and form:
             return site == "same-origin"
+        if ingress.enabled() and origin:
+            # The gateway authenticates the user; writes still require the actual iframe origin and X-Runway.
+            parsed = urllib.parse.urlsplit(origin)
+            return parsed.scheme in ("http", "https") and parsed.netloc.lower() == (self.headers.get("Host") or "").lower()
         if origin:   # "null" (sandboxed frames, file: pages) is never Runway
             return origin != "null" and host_allowed(urllib.parse.urlsplit(origin).netloc)
         return True
@@ -432,8 +441,20 @@ class Handler(BaseHTTPRequestHandler):
         url = urllib.parse.urlsplit(self.path)
         if url.path == "/healthz" and method == "GET":   # container health check: says nothing about your data
             return self._send(200, b"ok", "text/plain")
-        if not self._host_ok():
+        self.ingress_base = ""
+        if not ingress.enabled() and method == "GET" and url.path in ingress.SENSOR_PATHS and ingress.sensor_authorized(self.headers):
+            found = routes.match("GET", url.path)
+            assert found is not None
+            return self._json(200, routes.dispatch(found, urllib.parse.parse_qs(url.query), {}))
+        if ingress.enabled():
+            base = ingress.base_path(self.client_address[0], self.headers)
+            if base is None:
+                return self._send(403, b"Open this application through Home Assistant Ingress.", "text/plain")
+            self.ingress_base = base
+        elif not self._host_ok():
             return self._send(403, b"Runway doesn't recognise this address. Add it to RUNWAY_ALLOWED_HOSTS.", "text/plain")
+        if ingress.manual_only() and not ingress.allowed(url.path):
+            return self._json(403, {"error": "Bank synchronization and external connections are disabled in this manual-only deployment."})
         if url.path.startswith("/api/ext/"):   # the browser extension: its own key instead of a sign-in
             return self._extension(method, url.path)
         if url.path == "/mcp":   # MCP over HTTP, served here: an OAuth access token instead of a sign-in
@@ -614,6 +635,20 @@ class Handler(BaseHTTPRequestHandler):
         self._dispatch("DELETE")
 
 
+class SensorHandler(Handler):
+    """A separate optional internal listener: bearer-authenticated, read-only, four bounded summaries only."""
+
+    def _route(self, method: str) -> None:
+        path = urllib.parse.urlsplit(self.path)
+        if not ingress.sensor_authorized(self.headers):
+            return self._json(401, {"error": "A configured read-only sensor token is required"})
+        if method != "GET" or path.path not in ingress.SENSOR_PATHS:
+            return self._json(403, {"error": "This listener only provides read-only Home Assistant summaries"})
+        found = routes.match("GET", path.path)
+        assert found is not None
+        return self._json(200, routes.dispatch(found, urllib.parse.parse_qs(path.query), {}))
+
+
 class Server(ThreadingHTTPServer):
     """The standard threaded server, with a cap on requests handled at once so a flood can't exhaust the machine."""
     daemon_threads = True
@@ -684,10 +719,12 @@ def serve(host: str = "127.0.0.1", port: int = 8765, auto_sync: bool = True) -> 
         problems = oidc.check_config()
         if problems:
             raise SystemExit("Sign-in (OIDC) isn't set up correctly:\n  - " + "\n  - ".join(problems))
-    elif host not in ("127.0.0.1", "localhost", "::1") and os.environ.get("RUNWAY_ALLOW_NO_AUTH") != "1":
+    elif host not in ("127.0.0.1", "localhost", "::1") and os.environ.get("RUNWAY_ALLOW_NO_AUTH") != "1" and not ingress.enabled():
         raise SystemExit("Runway is set to accept connections from other devices, so it needs sign-in.\n"
                          "Set OIDC_ISSUER, OIDC_CLIENT_ID, OIDC_CLIENT_SECRET, RUNWAY_PUBLIC_URL and OIDC_ALLOWED_EMAILS\n"
                          "(or RUNWAY_ALLOW_NO_AUTH=1 if a proxy in front of Runway already handles sign-in).")
+    if ingress.manual_only():
+        auto_sync = False
     db.init()   # migrations included: repairs for data saved by earlier versions are among them (0039)
     sync.AUTO_SYNC = auto_sync   # sync_on_visit reads it there
     if auto_sync:

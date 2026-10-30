@@ -13,3 +13,9 @@ docs
 postgres
 frontend/node_modules
 runway/static/app
+artifacts
+.claude
+.env.*
+**/.env
+**/.env.*
+**/*.pem

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { appPath } from "$lib/path";
   import { signInUrl } from "$lib/api";
   import { app, boot, route, whenBooted } from "$lib/app.svelte";
   import { lock } from "$lib/lock.svelte";
@@ -94,7 +95,7 @@
 <MobileNav />
 {#if lock.covered}
   <!-- In the background with the lock on: covered, so the app switcher's preview shows nothing of yours. -->
-  <div class="fixed inset-0 z-[100] flex items-center justify-center bg-background" aria-hidden="true"><img src="/logo.svg" width="56" height="56" alt="" /></div>
+  <div class="fixed inset-0 z-[100] flex items-center justify-center bg-background" aria-hidden="true"><img src={appPath("/logo.svg")}  width="56" height="56" alt="" /></div>
 {/if}
 {/if}
 <Toaster />

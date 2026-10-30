@@ -1,3 +1,4 @@
+import { appPath } from "$lib/path";
 // Live prices, streamed from the server while the Investments page is open and visible: an update whenever a
 // holding's price moves. With the market closed the server sends the latest prices and the browser checks back
 // every few minutes. Browsers (or proxies) that can't stream fall back to asking every 30 seconds.
@@ -35,7 +36,7 @@ export function livePrices(onQuotes: (live: LiveQuotes) => void): () => void {
   const start = () => {
     if (stopped || document.hidden || source || timer) return;
     if (!window.EventSource || failures >= 3) { void tick(); return; }
-    const src = (source = new EventSource("/api/investments/stream"));
+    const src = (source = new EventSource(appPath("/api/investments/stream")));
     let got = false;
     src.addEventListener("quotes", (e) => { got = true; failures = 0; if (!stopped) onQuotes(JSON.parse((e as MessageEvent).data)); });
     // The server ends each stream on purpose (market closed, or after a while) and the browser reconnects on its own.

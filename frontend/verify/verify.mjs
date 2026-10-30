@@ -28,7 +28,7 @@ export const VIEWPORTS = { phone: { width: 440, height: 956 }, desktop: { width:
 export const DEFAULT_VIEWPORTS = ["phone", "desktop"];
 // Only a flow that lists it runs here (not every page): a phone turned sideways, which app.css still counts as a phone (short, touch-driven).
 export const LANDSCAPE = { landscape: { width: 844, height: 390 } };
-export const PAGES = ["overview", "transactions", "budget", "investments", "recurring", "networth", "reports", "churning", "setup"];
+export const PAGES = ["overview", "family", "spending", "cardplanner", "transactions", "budget", "investments", "recurring", "networth", "reports", "churning", "setup"];
 
 /** The browser to launch: the Chromium preinstalled under PLAYWRIGHT_BROWSERS_PATH (or /opt/pw-browsers) when there is
  *  one, whatever its revision, otherwise undefined (Playwright's own download). */

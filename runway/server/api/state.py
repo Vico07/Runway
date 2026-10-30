@@ -34,6 +34,8 @@ def api_state(conn, _q, _b):
     ollama = s[sk.AI_PROVIDER] == "ollama"
     return {
         "connected": connected,
+        "manual_only": os.environ.get("RUNWAY_MANUAL_ONLY") == "1" or os.environ.get("RUNWAY_HA_INGRESS") == "1",
+        "has_accounts": bool(conn.execute(select(Account.id).where(Account.hidden == 0).limit(1)).fetchone()),
         "brands": brands.account_brands(conn),   # each account's institution logo (or letter)
         "connection_logos": brands.connection_logos(conn),   # each bank connection's, by its institution's name
         "simplefin": sk.SIMPLEFIN_ACCESS_URL in present,

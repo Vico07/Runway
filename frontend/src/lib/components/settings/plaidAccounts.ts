@@ -49,6 +49,6 @@ export function sourceInfo(a: SettingsAccount, plaid: PlaidStatus | null) {
   // Shown once Plaid is set up, or this account already uses it.
   const showSource = !!link || own || !!invLinked || ((linkKind || invKind) && !!plaid && (plaid.configured || plaid.items.length > 0));
   const mask = link?.mask ? ` ••${link.mask}` : behind?.p.mask && (own || invLinked) ? ` ••${behind.p.mask}` : "";
-  const source = own ? `Plaid${mask}` : link || invLinked ? `SimpleFIN + Plaid${mask}` : "SimpleFIN";
+  const source = a.provider === "manual" ? "Manual" : own ? `Plaid${mask}` : link || invLinked ? `SimpleFIN + Plaid${mask}` : "SimpleFIN";
   return { link, canSwitch, where, own, behind, linkKind, invKind, invLinked, showSource, source };
 }

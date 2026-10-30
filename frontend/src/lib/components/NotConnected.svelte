@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { appPath } from "$lib/path";
   import { Button } from "$lib/components/ui/button";
   import * as Card from "$lib/components/ui/card";
 
@@ -11,7 +12,7 @@
 
 <Card.Root class="mx-auto mt-6 max-w-xl text-center md:mt-10">
   <Card.Header>
-    <img src="/logo.svg" alt="" width="40" height="40" class="mx-auto mb-2" />
+    <img src={appPath("/logo.svg")}  alt="" width="40" height="40" class="mx-auto mb-2" />
     <Card.Title class="text-xl">{title}</Card.Title>
     {#if text}<Card.Description>{text}</Card.Description>{/if}
   </Card.Header>

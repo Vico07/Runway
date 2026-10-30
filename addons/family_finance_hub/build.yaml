@@ -1,0 +1,3 @@
+# Supervisor builds on the amd64 Home Assistant OS host. Base images are pinned in Dockerfile.
+args:
+  VERSION: family-addon-0.1.0

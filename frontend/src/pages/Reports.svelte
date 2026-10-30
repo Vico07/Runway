@@ -22,7 +22,7 @@
 
 <h1 class="mb-6 text-[34px] leading-[1.05] font-extrabold tracking-[-0.035em]">Reports</h1>
 <SubTabs label="Reports" current={tab.id} tabs={TABS.map((t) => ({ id: t.id, label: t.label, href: `#reports/${t.id}` }))} />
-{#if app.state?.connected}
+{#if app.state?.connected || app.state?.has_accounts}
   <tab.view />
 {:else}
   <NotConnected title="Connect a bank to see where your money goes"

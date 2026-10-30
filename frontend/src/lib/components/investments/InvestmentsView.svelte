@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { appPath } from "$lib/path";
   import { api } from "$lib/api";
   import BarChart from "$lib/components/investments/BarChart.svelte";
   import AccountsCard from "$lib/components/investments/AccountsCard.svelte";
@@ -143,7 +144,7 @@
   <!-- Nothing to show yet: the same card as a page without a bank (NotConnected), for investment accounts -->
   <Card.Root class="mx-auto mt-6 max-w-xl text-center md:mt-10" data-testid="getting-started">
     <Card.Header>
-      <img src="/logo.svg" alt="" width="40" height="40" class="mx-auto mb-2" />
+      <img src={appPath("/logo.svg")}  alt="" width="40" height="40" class="mx-auto mb-2" />
       <Card.Title class="text-xl">Connect a brokerage or retirement account</Card.Title>
       <Card.Description>Its holdings, returns and allocation show up here. For one that only sends a balance, you can enter its holdings by hand.</Card.Description>
     </Card.Header>

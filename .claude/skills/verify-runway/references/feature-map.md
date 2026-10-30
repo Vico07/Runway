@@ -43,6 +43,42 @@ What a person can do in the web app, by page: what is there, how to reach it, ho
 - **Touches:** `Dismiss `, `Show dismissed`, `Show again `.
 - **Drive it:** `tools/control flow overview-dismiss`; or `make verify PAGES="overview-dismiss"`.
 
+## Family Finance Hub (`family`)
+
+- **What exists:** Manual balances, scheduled payments, temporary scenarios and November/December 2026 checking cash flow. Docs: [Family Finance Hub](../../../../docs/src/content/docs/using/family.md).
+- **Reach it:** desktop: sidebar > Day to day > Family Finance Hub; phone: tab bar > More; URL `#family`; control `tools/control goto family`.
+- **Drive it:** `tools/control goto family`, `tools/control snapshot --text`, then `click`/`type`/`press`; `tools/control viewport phone|desktop`; batch check `make verify PAGES="family"`.
+
+### Flows on Family Finance Hub
+
+#### `family-scenario`
+
+- **Starts at:** `#family`.
+- **Widths:** phone, desktop.
+- **Touches:** `What-if opening balance`, `November 2026`.
+- **Drive it:** `tools/control flow family-scenario`; or `make verify PAGES="family-scenario"`.
+
+## Budget & Spending (`spending`)
+
+- **What exists:** Household consumption, category budgets, statement imports and reconciliation warnings. Docs: [Budget & Spending](../../../../docs/src/content/docs/using/spending.md).
+- **Reach it:** desktop: sidebar > Day to day > Budget & Spending; phone: tab bar > More; URL `#spending`; control `tools/control goto spending`.
+- **Drive it:** `tools/control goto spending`, `tools/control snapshot --text`, then `click`/`type`/`press`; `tools/control viewport phone|desktop`; batch check `make verify PAGES="spending"`.
+
+## Smart Card Planner (`cardplanner`)
+
+- **What exists:** no docs page of its own.
+- **Reach it:** desktop: sidebar > Day to day > Smart Card Planner; phone: tab bar > More; URL `#cardplanner`; control `tools/control goto cardplanner`.
+- **Drive it:** `tools/control goto cardplanner`, `tools/control snapshot --text`, then `click`/`type`/`press`; `tools/control viewport phone|desktop`; batch check `make verify PAGES="cardplanner"`.
+
+### Flows on Smart Card Planner
+
+#### `card-planner-scenario`
+
+- **Starts at:** `#cardplanner`.
+- **Widths:** phone, desktop.
+- **Touches:** `Merchant`, `Purchase amount`, `Proposed purchase date`.
+- **Drive it:** `tools/control flow card-planner-scenario`; or `make verify PAGES="card-planner-scenario"`.
+
 ## Transactions (`transactions`)
 
 - **What exists:** The transaction list, review, categories, rules, splits and receipts. Docs: [Transactions](../../../../docs/src/content/docs/using/transactions.md).

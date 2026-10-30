@@ -15,7 +15,7 @@ Not every route is covered yet; tools/api_contract.py lists the ones that are.
 """
 from __future__ import annotations
 
-from typing import Literal, NotRequired, TypedDict
+from typing import Any, Literal, NotRequired, TypedDict
 
 
 class Ok(TypedDict):
@@ -472,3 +472,67 @@ class PlaidRefresh(TypedDict):
     refresh: bool
     refresh_paused: str | None
     refresh_paused_at: str | None
+
+
+# Family Finance Hub
+class FamilyAccountBody(TypedDict):
+    balance: float | str
+    balance_date: str
+    id: NotRequired[str]
+    name: NotRequired[str]
+    kind: NotRequired[str]
+
+
+class FamilyAccountReply(Ok):
+    id: str
+
+
+class FamilyForecastBody(TypedDict):
+    start: str
+    account_id: str
+    balances: NotRequired[dict[str, float | str]]
+    edits: NotRequired[dict[str, float | str]]
+
+
+class FamilyLow(TypedDict):
+    date: str
+    balance: float
+
+
+class FamilyMonth(TypedDict):
+    month: str
+    opening: float
+    closing: float
+    income: float
+    expenses: float
+    net: float
+    low: FamilyLow
+    days: list[FamilyLow]
+
+
+class FamilyEvent(TypedDict):
+    key: str
+    name: str
+    date: str
+    amount: float
+    kind: str
+
+
+class FamilyForecastReply(TypedDict):
+    start: str
+    account_id: str
+    baseline: list[FamilyMonth]
+    scenario: list[FamilyMonth]
+    events: list[FamilyEvent]
+    warnings: list[str]
+    scenario_warnings: list[str]
+
+
+class FamilyModuleReply(TypedDict):
+    """Extensible feature data; every write is independently validated by its handler."""
+    data: dict[str, Any]
+
+
+class FamilyModuleBody(TypedDict):
+    action: NotRequired[str]
+    data: dict[str, Any]

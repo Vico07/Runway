@@ -17,6 +17,8 @@ interface SyncLog { ok: boolean; message?: string; at?: string }
 /** GET /api/state (runway/server.py api_state). */
 export interface AppState {
   connected: boolean;
+  has_accounts?: boolean;
+  manual_only?: boolean;
   brands?: Record<string, Brand>;
   /** Each bank connection's logo by its institution's name (null: its letter). */
   connection_logos?: Record<string, string | null>;

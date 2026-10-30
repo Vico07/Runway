@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { appPath } from "$lib/path";
   import { tick, untrack } from "svelte";
   import { app, route } from "$lib/app.svelte";
   import { MAIN_NAV, MONEY_NAV, currentPage, signOut, signedInUser, syncDot, syncStatus, type NavItem } from "$lib/nav.svelte";
@@ -64,7 +65,7 @@
       {#if s?.version}<span class="shrink-0 pt-2">Runway {s.version}</span>{/if}
     </div>
     {#if user}
-      <a href="/auth/logout" onclick={signOut} class="mt-3 flex min-h-11 items-center gap-2 text-sm text-muted-foreground"><LogOut class="size-4" />Sign out {user.email ?? ""}</a>
+      <a href={appPath("/auth/logout")}  onclick={signOut} class="mt-3 flex min-h-11 items-center gap-2 text-sm text-muted-foreground"><LogOut class="size-4" />Sign out {user.email ?? ""}</a>
     {/if}
   </Sheet.Content>
 </Sheet.Root>

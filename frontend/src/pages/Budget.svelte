@@ -9,7 +9,7 @@
 <div class="mb-4 flex items-center gap-1">
   <h1 class="text-[34px] leading-[1.05] font-extrabold tracking-[-0.035em]">Budget</h1>
 </div>
-{#if !app.state?.connected}
+{#if !(app.state?.connected || app.state?.has_accounts)}
   <NotConnected title="Connect a bank to set a budget"
     text="Budgets track what you spend in each category, from your transactions. The first sync brings in months of history." />
 {:else}<BudgetView />{/if}

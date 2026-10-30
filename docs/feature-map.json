@@ -8,6 +8,7 @@
       "tests": [
         "tests/test_applock.py",
         "tests/test_backup.py",
+        "tests/test_ha_ingress.py",
         "tests/test_http_pinned.py"
       ],
       "docs": [
@@ -56,6 +57,7 @@
       ],
       "tests": [
         "tests/test_api_handlers.py",
+        "tests/test_ha_ingress.py",
         "tests/test_http_pinned.py",
         "tests/test_monitoring.py"
       ],
@@ -94,9 +96,7 @@
       "method": "GET",
       "path": "/api/investments/stream",
       "handler": "runway/server/api/investments.py:api_quote_stream",
-      "web": [
-        "frontend/src/lib/components/investments/live.ts"
-      ],
+      "web": [],
       "tests": [
         "tests/test_http_pinned.py",
         "tests/test_investments.py"
@@ -113,6 +113,7 @@
       "tests": [
         "tests/test_brands.py",
         "tests/test_categorize.py",
+        "tests/test_ha_ingress.py",
         "tests/test_hardening.py",
         "tests/test_http_pinned.py",
         "tests/test_merchants.py",
@@ -196,16 +197,198 @@
       ]
     },
     {
+      "method": "POST",
+      "path": "/api/family/accounts",
+      "handler": "runway/server/api/family.py:api_family_account",
+      "web": [
+        "frontend/src/pages/Family.svelte"
+      ],
+      "tests": [
+        "tests/test_api_contract.py",
+        "tests/test_family.py",
+        "tests/test_ha_ingress.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/family/forecast",
+      "handler": "runway/server/api/family.py:api_family_forecast",
+      "web": [
+        "frontend/src/pages/Family.svelte"
+      ],
+      "tests": [
+        "tests/test_api_contract.py",
+        "tests/test_family.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/ha/summary",
+      "handler": "runway/server/api/ha.py:api_ha_summary",
+      "web": [],
+      "tests": [
+        "tests/test_api_contract.py",
+        "tests/test_ha_ingress.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/ha/upcoming",
+      "handler": "runway/server/api/ha.py:api_ha_upcoming",
+      "web": [],
+      "tests": [
+        "tests/test_api_contract.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/ha/cashflow",
+      "handler": "runway/server/api/ha.py:api_ha_cashflow",
+      "web": [],
+      "tests": [
+        "tests/test_api_contract.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/ha/budget",
+      "handler": "runway/server/api/ha.py:api_ha_budget",
+      "web": [],
+      "tests": [
+        "tests/test_api_contract.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/spending",
+      "handler": "runway/server/api/spending.py:api_spending",
+      "web": [
+        "frontend/src/pages/Spending.svelte"
+      ],
+      "tests": [
+        "tests/test_api_contract.py",
+        "tests/test_spending_hub.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/spending/classify",
+      "handler": "runway/server/api/spending.py:api_spending_classify",
+      "web": [
+        "frontend/src/pages/Spending.svelte"
+      ],
+      "tests": [
+        "tests/test_api_contract.py",
+        "tests/test_spending_hub.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/spending/import",
+      "handler": "runway/server/api/spending.py:api_spending_import",
+      "web": [
+        "frontend/src/pages/Spending.svelte"
+      ],
+      "tests": [
+        "tests/test_api_contract.py",
+        "tests/test_spending_hub.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "GET",
+      "path": "/api/cardplanner",
+      "handler": "runway/server/api/cardplanner.py:api_cardplanner",
+      "web": [
+        "frontend/src/pages/CardPlanner.svelte"
+      ],
+      "tests": [
+        "tests/test_api_contract.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/cardplanner/profile",
+      "handler": "runway/server/api/cardplanner.py:api_card_profile",
+      "web": [
+        "frontend/src/pages/CardPlanner.svelte"
+      ],
+      "tests": [
+        "tests/test_api_contract.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/cardplanner/quote",
+      "handler": "runway/server/api/cardplanner.py:api_card_quote",
+      "web": [
+        "frontend/src/pages/CardPlanner.svelte"
+      ],
+      "tests": [
+        "tests/test_api_contract.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/cardplanner/purchase",
+      "handler": "runway/server/api/cardplanner.py:api_card_purchase",
+      "web": [
+        "frontend/src/pages/CardPlanner.svelte"
+      ],
+      "tests": [
+        "tests/test_api_contract.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/cardplanner/rule",
+      "handler": "runway/server/api/cardplanner.py:api_card_rule",
+      "web": [
+        "frontend/src/pages/CardPlanner.svelte"
+      ],
+      "tests": [
+        "tests/test_api_contract.py",
+        "tests/test_cardplanner.py"
+      ],
+      "docs": []
+    },
+    {
+      "method": "POST",
+      "path": "/api/cardplanner/purchase/{id}/cancel",
+      "handler": "runway/server/api/cardplanner.py:api_card_cancel",
+      "web": [
+        "frontend/src/pages/CardPlanner.svelte"
+      ],
+      "tests": [
+        "tests/test_api_contract.py"
+      ],
+      "docs": []
+    },
+    {
       "method": "GET",
       "path": "/api/accounts",
       "handler": "runway/server/api/accounts.py:api_accounts",
       "web": [
-        "frontend/src/lib/accounts.ts"
+        "frontend/src/lib/accounts.ts",
+        "frontend/src/pages/Family.svelte"
       ],
       "tests": [
         "tests/test_api_contract.py",
         "tests/test_api_handlers.py",
         "tests/test_api_queries.py",
+        "tests/test_ha_ingress.py",
         "tests/test_http_pinned.py",
         "tests/test_routes.py",
         "tests/test_statements.py"
@@ -222,11 +405,13 @@
         "frontend/src/lib/components/settings/AccountRow.svelte",
         "frontend/src/lib/components/settings/LoanTerms.svelte",
         "frontend/src/lib/components/settings/PlaidLink.svelte",
+        "frontend/src/pages/Family.svelte",
         "frontend/src/pages/NetWorth.svelte"
       ],
       "tests": [
         "tests/test_api_handlers.py",
         "tests/test_api_validation.py",
+        "tests/test_family.py",
         "tests/test_mcp.py",
         "tests/test_networth.py"
       ],
@@ -1239,11 +1424,13 @@
       "path": "/api/recurring",
       "handler": "runway/server/api/recurring.py:api_recurring_add",
       "web": [
-        "frontend/src/lib/components/recurring/RecurringView.svelte"
+        "frontend/src/lib/components/recurring/RecurringView.svelte",
+        "frontend/src/pages/Family.svelte"
       ],
       "tests": [
         "tests/test_api_validation.py",
         "tests/test_categories_recurring_pinned.py",
+        "tests/test_family.py",
         "tests/test_forecast_schedule.py",
         "tests/test_http_server.py",
         "tests/test_recurring.py",

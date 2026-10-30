@@ -1,0 +1,45 @@
+{
+  "name": "family-scenario",
+  "page": "family",
+  "steps": [
+    {
+      "wait_for": "role=button[name='Compare cash flow']"
+    },
+    {
+      "click": "role=button[name='Compare cash flow']"
+    },
+    {
+      "wait_for": "role=region[name='November 2026']"
+    },
+    {
+      "wait_for": "role=region[name='December 2026']"
+    },
+    {
+      "fill": {
+        "selector": "label:has-text(\"What-if opening balance\") input",
+        "text": "5500"
+      }
+    },
+    {
+      "click": "role=button[name='Compare cash flow']"
+    },
+    {
+      "wait_for": "role=region[name='November 2026']"
+    },
+    {
+      "click": "section[aria-label='November 2026'] summary"
+    },
+    {
+      "screenshot": "daily-comparison"
+    },
+    {
+      "click": "role=button[name='Reset scenario']"
+    },
+    {
+      "click": "role=button[name='Compare cash flow']"
+    },
+    {
+      "wait_for": "role=region[name='December 2026']"
+    }
+  ]
+}

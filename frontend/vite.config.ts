@@ -9,7 +9,7 @@ import { defineConfig } from "vite";
 // The built app goes to runway/static/app/, which the Python server serves at /.
 // `npm run dev` serves it on its own port and passes API calls (and Runway's own files) through to Runway on 8765.
 export default defineConfig({
-  base: "/",
+  base: "./",
   // svelteTesting() makes Svelte resolve to its browser build under Vitest and unmounts components after each test.
   // codecovVitePlugin() sends the build's bundle sizes to Codecov, which tracks them and reports the change on pull
   // requests. Only in CI, where CODECOV_TOKEN is set; elsewhere it does nothing.

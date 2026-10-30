@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { appPath } from "$lib/path";
   import { api } from "$lib/api";
   import { autosave } from "$lib/autosave";
   import { Button } from "$lib/components/ui/button";
@@ -55,7 +56,7 @@
     <b class="text-sm">Carta</b>
     <span class="text-xs text-muted-foreground">
       {c.web_last ? `last read ${fmtDate(c.web_last)}` : "not read yet"}
-      {#if c.web_capture}{" · "}<a class={linkCls} href="/api/carta/capture" download>Download what the extension read</a> (to see why something's missing){/if}
+      {#if c.web_capture}{" · "}<a class={linkCls} href={appPath("/api/carta/capture")}  download>Download what the extension read</a> (to see why something's missing){/if}
     </span>
   </div>
   {#if c.web_error}<ProblemNote class="my-2" text="The extension couldn’t read Carta last time." detail={c.web_error} />{/if}

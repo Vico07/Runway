@@ -276,3 +276,9 @@ describe("the app lock", () => {
     lock.phase = "off";
   });
 });
+
+ it("manual-only deployments never request automatic bank synchronization", async () => {
+   app.state = state({manual_only:true});
+   await syncOnVisit();
+   expect(api).not.toHaveBeenCalled();
+ });
