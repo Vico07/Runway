@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 # Supervisor builds this directory alone. Fetch the same application sources; do not duplicate the UI or backend.
 FROM scratch AS source
-ARG RUNWAY_SOURCE=https://github.com/Vico07/Runway.git#feat/family-finance-hub-home
+ARG RUNWAY_SOURCE=https://github.com/Vico07/Runway.git#41235e2416338ba33959afc911a876c758e4aa14
 ADD ${RUNWAY_SOURCE} /source/
 
 # The base images are pinned by digest (the tag is for reading); Dependabot moves the digests weekly.
